@@ -1,4 +1,4 @@
-
+登录后保存
    
 
 注册 登录   文件  发布      
@@ -27,7 +27,7 @@ Authors:
 Setup
 To download the Flink service folder, run below
 VERSION=`hdp-select status hadoop-client | sed 's/hadoop-client - \([0-9]\.[0-9]\).*/\1/'`
-sudo git clone https://github.com/abajwa-hw/ambari-flink-service.git   /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/FLINK   
+sudo git clone https://github.com/bright60/ambari-flink-service.git  /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/FLINK   
 To download the flink-1.9.1-bin-scala_2.12.tgz from https://flink.apache.org/downloads.html
  https://www-us.apache.org/dist/flink/flink-1.9.1/flink-1.9.1-bin-scala_2.12.tgz
 To compile flink-shaded-hadoop-2-uber jar file from source code
@@ -165,7 +165,9 @@ rm -rfv /tmp/flink-1.*
 rm -rfv /tmp/flink-shaded-hadoop*
 rm -rfv /var/lib/ambari-server/resources/stacks/HDP/3.1/services/FLINK
 rm -rfv /opt/flink
+userdel flink
+groupdel flink
 ambari-server restart
 VERSION=`hdp-select status hadoop-client | sed 's/hadoop-client - \([0-9]\.[0-9]\).*/\1/'`
-sudo git clone https://github.com/abajwa-hw/ambari-flink-service.git   /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/FLINK   
+sudo git clone https://github.com/bright60/ambari-flink-service.git   /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/FLINK   
 ambari-server restart
