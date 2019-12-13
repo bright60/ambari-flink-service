@@ -2,21 +2,19 @@ import sys, os, pwd, grp, signal, time, glob, subprocess
 from resource_management import *
 from subprocess import call
 
-
-
-
-
 class Master(Script):
   def install(self, env):
 
     import params
     import status_params
-      
-
-            
+  
+           
     #e.g. /var/lib/ambari-agent/cache/stacks/HDP/2.3/services/FLINK/package
     service_packagedir = os.path.realpath(__file__).split('/scripts')[0] 
-            
+    #with open('/tmp/test2.txt','a') as f:
+    #   	    f.write("------111--")
+    #   	    f.write(params.flink_install_dir + '\r\n')
+              
     Execute('rm -rf ' + params.flink_install_dir, ignore_failures=True)
             
     Directory([status_params.flink_pid_dir, params.flink_log_dir, params.flink_install_dir],
@@ -39,13 +37,27 @@ class Master(Script):
 
       Execute('echo Installing packages')
         
- 
+      temp_flink_file=params.temp_dir + '/' + os.path.basename(params.flink_download_url)
+      temp_flink_shaded_file=params.temp_dir + '/' + os.path.basename(params.flink_hadoop_shaded_jar_url)
+
+      #with open('/tmp/test2.txt','a') as f:
+	  #  f.write('-----2 \r\n')
+	  #  f.write(params.temp_file + '\r\n')
+	  #  f.write(params.flink_download_url + '\r\n')
+	  #  f.write(params.flink_log_file + '\r\n')
+	  #  f.write(params.flink_user + '\r\n')
+      
       #Fetch and unzip snapshot build, if no cached flink tar package exists on Ambari server node
-      if not os.path.exists(params.temp_file):
-        Execute('wget '+params.flink_download_url+' -O '+params.temp_file+' -a '  + params.flink_log_file, user=params.flink_user)
-        Execute('tar -zxvf '+params.temp_file+' -C ' + params.flink_install_dir + ' >> ' + params.flink_log_file, user=params.flink_user)
-        Execute('mv '+params.flink_install_dir+'/*/* ' + params.flink_install_dir, user=params.flink_user)
-        Execute('wget ' + params.flink_hadoop_shaded_jar_url + ' -P ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
+      if not os.path.exists(temp_flink_file):
+        Execute('wget ' + params.flink_download_url+' -O '+ temp_flink_file +' -a '  + params.flink_log_file, user=params.flink_user)
+      
+      if not os.path.exists(temp_flink_shaded_file):
+        Execute('wget ' + params.flink_hadoop_shaded_jar_url+' -O '+ temp_flink_shaded_file +' -a '  + params.flink_log_file, user=params.flink_user)
+        #Execute('wget ' + params.flink_hadoop_shaded_jar_url + ' -P ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
+      
+      Execute('tar -zxvf '+ temp_flink_file +' -C ' + params.flink_install_dir + ' >> ' + params.flink_log_file, user=params.flink_user)
+      Execute('mv '+params.flink_install_dir+'/*/* ' + params.flink_install_dir, user=params.flink_user)
+      Execute('cp -fv '+temp_flink_shaded_file + ' ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
 
       #update the configs specified by user
       self.configure(env, True)

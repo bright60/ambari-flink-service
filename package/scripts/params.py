@@ -37,6 +37,5 @@ flink_group = config['configurations']['flink-env']['flink_group']
 flink_log_dir = config['configurations']['flink-env']['flink_log_dir']
 flink_log_file = os.path.join(flink_log_dir,'flink-setup.log')
 
-
-
-temp_file='/tmp/flink.tgz'
+temp_dir='/tmp'
+#temp_file='/tmp/flink.tgz'

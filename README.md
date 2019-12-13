@@ -3,52 +3,80 @@ Ambari service for easily installing and managing Flink on HDP clusters.
 Apache Flink is an open source platform for distributed stream and batch data processing
 More details on Flink and how it is being used in the industry today available here: [http://flink-forward.org/?post_type=session](http://flink-forward.org/?post_type=session)
 
-
-The Ambari service lets you easily install/compile Flink on HDP 2.6.5
+The Ambari service lets you easily install/compile Flink, now it has been upgraed to support flink 1.9.1 on HDP 3.1.1 for Ambari 2.7.4 (Redhat/CentOS7.x).
 - Features:
-  - By default, downloads prebuilt package of Flink 1.8.1, but also gives option to build the latest Flink from source instead
+  - By default, downloads prebuilt package of Flink 1.9.1, but also gives option to build the latest Flink from source instead
   - Exposes flink-conf.yaml in Ambari UI 
 
 Limitations:
   - This is not an officially supported service and *is not meant to be deployed in production systems*. It is only meant for testing demo/purposes
   - It does not support Ambari/HDP upgrade process and will cause upgrade problems if not removed prior to upgrade
 
-Author: [Ali Bajwa](https://github.com/abajwa-hw)
+- Thanks to the orginial author: [Ali Bajwa](https://github.com/abajwa-hw)
 - Thanks to [Davide Vergari](https://github.com/dvergari) for enhancing to run in clustered env
 - Thanks to [Ben Harris](https://github.com/jamesbenharris) for updating libraries to work with HDP 2.5.3
 - Thanks to [Anand Subramanian](https://github.com/anandsubbu) for updating libraries to work with HDP 2.6.5 and flink version 1.8.1
+
 #### Setup
-
-- Download HDP 2.6 sandbox VM image (HDP_2.6.5_virtualbox_180626.ova) from [Cloudera website](https://www.cloudera.com/downloads/hortonworks-sandbox/hdp.html)
-- Import HDP_2.6.5_virtualbox_180626.ova into VMWare and set the VM memory size to 8GB
-- Now start the VM
-- After it boots up, find the IP address of the VM and add an entry into your machines hosts file. For example:
-```
-192.168.191.241 sandbox.hortonworks.com sandbox    
-```
-  - Note that you will need to replace the above with the IP for your own VM
-  
-- Connect to the VM via SSH (password hadoop)
-```
-ssh root@sandbox.hortonworks.com
-```
-
 
 - To download the Flink service folder, run below
 ```
 VERSION=`hdp-select status hadoop-client | sed 's/hadoop-client - \([0-9]\.[0-9]\).*/\1/'`
 sudo git clone https://github.com/abajwa-hw/ambari-flink-service.git   /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/FLINK   
 ```
+- To download the flink-1.9.1-bin-scala_2.12.tgz from https://flink.apache.org/downloads.html
+```
+ https://www-us.apache.org/dist/flink/flink-1.9.1/flink-1.9.1-bin-scala_2.12.tgz
+``` 
+ 
+- To compile flink-shaded-hadoop-2-uber jar file from source code
+  (In order to make sure flink-1.9.1 works correctly, you have to compile flink-shaded-hadoop-2-uber using flink-shaded-9.0 since you cannot find the flink-shaded-hadoop-2-uber jar file from internet  for hadoop 3.x version now £¨2019.12.10£©. )
+```
+ wget https://www.apache.org/dyn/closer.lua/flink/flink-shaded-9.0/flink-shaded-9.0-src.tgz
+ tar xvfz flink-shaded-9.0-src.tgz
+ 
+ or get the source from https://github.com/apache/flink-shaded.git
+ git clone https://github.com/apache/flink-shaded.git
+ git checkout release-7.0
 
+ cd flink-shaded-9.0
+ mvn clean install -DskipTest -Dhadoop.version=3.1.1
+ ll flink-shaded-hadoop-2-uber/target/
+ (flink-shaded-hadoop-2-uber-3.1.1-9.0.jar is in flink-shaded-hadoop-2-uber/target/ )
+```
+
+- To speed up the installation and resue the files, you can put flink-1.9.1-bin-scala_2.12.tgz and flink-shaded-hadoop-2-uber-3.1.1-9.0.jar into local www server.
+```
+yum install httpd
+mkdir -p  /var/www/html/hdp/services/flink
+cp -fv flink-1.9.1-bin-scala_2.12.tgz /var/www/html/hdp/services/flink/
+cp -fv flink-shaded-hadoop-2-uber-3.1.1-9.0.jar /var/www/html/hdp/services/flink/
+
+systemctl start httpd
+```
+then you can get the url, then the two urls in configuration/flink-ambari-config.xml
+```
+(please replace your www server ip and port)
+http://192.168.101.85:8181/hdp/services/flink/flink-1.9.1-bin-scala_2.12.tgz
+http://192.168.101.85:8181/hdp/services/flink/flink-shaded-hadoop-2-uber-3.1.1-9.0.jar
+```
+- Change or Confirm the links are correct in configuration/flink-ambari-config.xml 
+```
+  <property>
+    <name>flink_download_url</name>
+	<value>http://192.168.101.85:8181/hdp/services/flink/flink-1.9.1-bin-scala_2.12.tgz</value>
+    <description>Snapshot download location. Downloaded when setup_prebuilt is true</description>
+  </property>
+  <property>
+    <name>flink_hadoop_shaded_jar</name>
+	<value>http://192.168.101.85:8181/hdp/services/flink/flink-shaded-hadoop-2-uber-3.1.1-9.0.jar</value>   
+    <description>Flink shaded hadoop jar download location. Downloaded when setup_prebuilt is true</description>
+  </property>
+```
 - Restart Ambari
 ```
-#sandbox
-service ambari restart
-
-#non sandbox
-sudo service ambari-server restart
+ambari-server restart
 ```
-
 - Then you can click on 'Add Service' from the 'Actions' dropdown menu in the bottom left of the Ambari dashboard:
 
 On bottom left -> Actions -> Add service -> check Flink server -> Next -> Next -> Change any config you like (e.g. install dir, memory sizes, num containers or values in flink-conf.yaml) -> Next -> Deploy
@@ -146,4 +174,34 @@ curl -u admin:$PASSWORD -i -H 'X-Requested-By: ambari' -X PUT -d '{"RequestInfo"
 ```
 rm -rf /opt/flink*
 rm /tmp/flink.tgz
+```
+
+#### FAQ
+- user and group are not created when installing
+```
+You need to add the display-name and value-attributes fields to your flink-env.xml file on Ambari 2.7.x.
+Please refer to https://community.cloudera.com/t5/Support-Questions/Cannot-add-a-custom-service-through-Ambari-2-7-0/td-p/194331
+```
+- Check /var/log/flink/flink-setup.log for details of instllation
+- Delete the cache files when you change fink.py or other instllation files
+```
+ll /var/lib/ambari-agent/cache/stacks/HDP/3.1/services/FLINK/package/scripts/flink.py
+rm -rf /var/lib/ambari-agent/cache/stacks/HDP/3.1/services/FLINK
+```
+- hadoop: command not found
+```
+Issue log:
+2019-12-10 10:33:07,077 - Writing File['/opt/flink/conf/flink-conf.yaml'] because contents don't match
+2019-12-10 10:33:07,079 - Execute['hadoop fs -mkdir -p /user/flink'] {'ignore_failures': True, 'user': 'hdfs'}
+2019-12-10 10:33:07,230 - Skipping failure of Execute['hadoop fs -mkdir -p /user/flink'] due to ignore_failures. Failure reason: Execution of 'hadoop fs -mkdir -p /user/flink' returned 127. -bash: hadoop: command not found
+2019-12-10 10:33:07,231 - Execute['hadoop fs -chown flink /user/flink'] {'user': 'hdfs'}
+2019-12-10 10:33:07,366 - Skipping stack-select on FLINK because it does not exist in the stack-select package structure.
+
+Solved£º
+ln  -s  /usr/hdp/3.1.4.0-315/hadoop/bin/hadoop /etc/alternatives/hadoop  
+```
+- flink-1.9.1-bin-scala_2.12.tgz and flink-shaded-hadoop-2-uber-3.1.1-9.0.jar are cached in /tmp
+if you have to update both files, you should delete them from /tmp folder.
+```
+ll /tmp/flink*
 ```

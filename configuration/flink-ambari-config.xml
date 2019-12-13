@@ -69,13 +69,18 @@
 
   <property>
     <name>flink_download_url</name>
-    <value>http://apachemirror.wuchna.com/flink/flink-1.8.1/flink-1.8.1-bin-scala_2.11.tgz</value>
+	<!-- download it to local before installing: https://www-us.apache.org/dist/flink/flink-1.9.1/flink-1.9.1-bin-scala_2.12.tgz -->
+	<!-- <value>https://www-us.apache.org/dist/flink/flink-1.9.1/flink-1.9.1-bin-scala_2.12.tgz</value> -->
+	<value>http://192.168.101.85:8181/hdp/services/flink/flink-1.9.1-bin-scala_2.12.tgz</value>    
     <description>Snapshot download location. Downloaded when setup_prebuilt is true</description>
   </property>
 
   <property>
     <name>flink_hadoop_shaded_jar</name>
-    <value>https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.6.5-7.0/flink-shaded-hadoop-2-uber-2.6.5-7.0.jar</value>
+	<!-- download flink-shaded-9.0 from https://www.apache.org/dyn/closer.lua/flink/flink-shaded-9.0/flink-shaded-9.0-src.tgz
+	  compile flink-shared 9.0 for flink 1.9.1 on hadoop 3.1.1:  mvn clean install -DskipTest -Dhadoop.version=3.1.1 
+	  -->
+	<value>http://192.168.101.85:8181/hdp/services/flink/flink-shaded-hadoop-2-uber-3.1.1-9.0.jar</value>   
     <description>Flink shaded hadoop jar download location. Downloaded when setup_prebuilt is true</description>
   </property>
 </configuration>
