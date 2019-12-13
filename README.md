@@ -12,10 +12,12 @@ Limitations:
   - This is not an officially supported service and *is not meant to be deployed in production systems*. It is only meant for testing demo/purposes
   - It does not support Ambari/HDP upgrade process and will cause upgrade problems if not removed prior to upgrade
 
+Authors:
 - Thanks to the orginial author: [Ali Bajwa](https://github.com/abajwa-hw)
 - Thanks to [Davide Vergari](https://github.com/dvergari) for enhancing to run in clustered env
 - Thanks to [Ben Harris](https://github.com/jamesbenharris) for updating libraries to work with HDP 2.5.3
 - Thanks to [Anand Subramanian](https://github.com/anandsubbu) for updating libraries to work with HDP 2.6.5 and flink version 1.8.1
+- Thanks to bright for updating to support flink v1.9.1 on HDP v3.1.1 for Ambari v2.7.4 (Redhat/CentOS7.x)
 
 #### Setup
 
@@ -197,7 +199,7 @@ Issue log:
 2019-12-10 10:33:07,231 - Execute['hadoop fs -chown flink /user/flink'] {'user': 'hdfs'}
 2019-12-10 10:33:07,366 - Skipping stack-select on FLINK because it does not exist in the stack-select package structure.
 
-Solved£º
+Solved:
 ln  -s  /usr/hdp/3.1.4.0-315/hadoop/bin/hadoop /etc/alternatives/hadoop  
 ```
 - flink-1.9.1-bin-scala_2.12.tgz and flink-shaded-hadoop-2-uber-3.1.1-9.0.jar are cached in /tmp
