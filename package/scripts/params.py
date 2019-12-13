@@ -38,4 +38,8 @@ flink_log_dir = config['configurations']['flink-env']['flink_log_dir']
 flink_log_file = os.path.join(flink_log_dir,'flink-setup.log')
 
 temp_dir='/tmp'
+
+temp_flink_file=temp_dir + '/' + os.path.basename(flink_download_url)
+temp_flink_shaded_file=temp_dir + '/' + os.path.basename(flink_hadoop_shaded_jar_url)
+
 #temp_file='/tmp/flink.tgz'

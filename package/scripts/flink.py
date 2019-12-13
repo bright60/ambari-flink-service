@@ -37,8 +37,8 @@ class Master(Script):
 
       Execute('echo Installing packages')
         
-      temp_flink_file=params.temp_dir + '/' + os.path.basename(params.flink_download_url)
-      temp_flink_shaded_file=params.temp_dir + '/' + os.path.basename(params.flink_hadoop_shaded_jar_url)
+      #temp_flink_file=params.temp_dir + '/' + os.path.basename(params.flink_download_url)
+      #temp_flink_shaded_file=params.temp_dir + '/' + os.path.basename(params.flink_hadoop_shaded_jar_url)
 
       #with open('/tmp/test2.txt','a') as f:
 	  #  f.write('-----2 \r\n')
@@ -48,16 +48,16 @@ class Master(Script):
 	  #  f.write(params.flink_user + '\r\n')
       
       #Fetch and unzip snapshot build, if no cached flink tar package exists on Ambari server node
-      if not os.path.exists(temp_flink_file):
-        Execute('wget ' + params.flink_download_url+' -O '+ temp_flink_file +' -a '  + params.flink_log_file, user=params.flink_user)
+      if not os.path.exists(params.temp_flink_file):
+        Execute('wget ' + params.flink_download_url+' -O '+ params.temp_flink_file +' -a '  + params.flink_log_file, user=params.flink_user)
       
-      if not os.path.exists(temp_flink_shaded_file):
-        Execute('wget ' + params.flink_hadoop_shaded_jar_url+' -O '+ temp_flink_shaded_file +' -a '  + params.flink_log_file, user=params.flink_user)
+      if not os.path.exists(params.temp_flink_shaded_file):
+        Execute('wget ' + params.flink_hadoop_shaded_jar_url+' -O '+ params.temp_flink_shaded_file +' -a '  + params.flink_log_file, user=params.flink_user)
         #Execute('wget ' + params.flink_hadoop_shaded_jar_url + ' -P ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
       
-      Execute('tar -zxvf '+ temp_flink_file +' -C ' + params.flink_install_dir + ' >> ' + params.flink_log_file, user=params.flink_user)
+      Execute('tar -zxvf '+ params.temp_flink_file +' -C ' + params.flink_install_dir + ' >> ' + params.flink_log_file, user=params.flink_user)
       Execute('mv '+params.flink_install_dir+'/*/* ' + params.flink_install_dir, user=params.flink_user)
-      Execute('cp -fv '+temp_flink_shaded_file + ' ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
+      Execute('cp -fv '+ params.temp_flink_shaded_file + ' ' + params.flink_install_dir+'/lib' + ' >> ' + params.flink_log_file, user=params.flink_user)
 
       #update the configs specified by user
       self.configure(env, True)
@@ -126,8 +126,12 @@ class Master(Script):
     Execute("yarn application -list 2>/dev/null | awk '/" + params.flink_appname + "/ {print $1}' | head -n1 > " + status_params.flink_pid_file, user=params.flink_user)
     #Execute('chown '+params.flink_user+':'+params.flink_group+' ' + status_params.flink_pid_file)
 
-    if os.path.exists(params.temp_file):
-      os.remove(params.temp_file)
+    #if os.path.exists(params.temp_file):
+    #  os.remove(params.temp_file)
+    if os.path.exists(params.temp_flink_file):
+      os.remove(params.temp_flink_file)
+    if os.path.exists(params.temp_flink_shaded_file):
+      os.remove(params.temp_flink_shaded_file)
 
   def check_flink_status(self, pid_file):
     from datetime import datetime 
