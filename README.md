@@ -75,7 +75,7 @@ http://192.168.101.85:8181/hdp/services/flink/flink-shaded-hadoop-2-uber-3.1.1-9
     <description>Flink shaded hadoop jar download location. Downloaded when setup_prebuilt is true</description>
   </property>
 ```
-- Change and confirm some setting in configuration/flink-env.xml, env.java.home
+- Change and confirm some setting in configuration/flink-env.xml, such as env.java.home
 ```
 env.java.home: /usr/java/jdk1.8.0_121
 ```
