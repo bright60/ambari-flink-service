@@ -32,7 +32,7 @@ sudo git clone https://github.com/bright60/ambari-flink-service.git  /var/lib/am
 ``` 
  
 - To compile flink-shaded-hadoop-2-uber jar file from source code
-  (In order to make sure flink-1.9.1 works correctly, you have to compile flink-shaded-hadoop-2-uber using flink-shaded-9.0 since you cannot find the flink-shaded-hadoop-2-uber jar file from internet  for hadoop 3.x version now £¨2019.12.10£©. )
+  (In order to make sure flink-1.9.1 works correctly, you have to compile flink-shaded-hadoop-2-uber using flink-shaded-9.0 since you cannot find the flink-shaded-hadoop-2-uber jar file from internet  for hadoop 3.x version now ( 2019.12.10 )
 ```
  wget https://www.apache.org/dyn/closer.lua/flink/flink-shaded-9.0/flink-shaded-9.0-src.tgz
  tar xvfz flink-shaded-9.0-src.tgz
@@ -56,7 +56,7 @@ cp -fv flink-shaded-hadoop-2-uber-3.1.1-9.0.jar /var/www/html/hdp/services/flink
 
 systemctl start httpd
 ```
-then you can get the url, then the two urls in configuration/flink-ambari-config.xml
+then you can get the url, the two urls are configed in configuration/flink-ambari-config.xml
 ```
 (please replace your www server ip and port)
 http://192.168.101.85:8181/hdp/services/flink/flink-1.9.1-bin-scala_2.12.tgz
